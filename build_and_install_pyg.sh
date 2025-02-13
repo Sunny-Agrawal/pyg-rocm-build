@@ -5,17 +5,12 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "Script directory: ${script_dir}"
 
 # Parse command-line arguments
-force_rebuild_all=false
-modules_to_rebuild=()
+force_rebuild=""
 
 while [[ "$#" -gt 0 ]]; do
   case "$1" in
-    --force-rebuild)
-      force_rebuild_all=true
-      shift
-      ;;
-    --module=*)
-      modules_to_rebuild+=("${1#--module=}")
+    --force-rebuild=*)
+      force_rebuild="${1#--force-rebuild=}"
       shift
       ;;
     *)
@@ -56,8 +51,16 @@ cd "${script_dir}"
 
 modules=(pytorch_cluster-1.6.3 pytorch_scatter-2.1.2 pytorch_sparse-0.6.18 pytorch_spline_conv-1.2.2)
 
+# Determine modules to rebuild
+modules_to_rebuild=()
+if [ "$force_rebuild" == "all" ]; then
+  modules_to_rebuild=("${modules[@]}")
+else
+  IFS=',' read -r -a modules_to_rebuild <<< "$force_rebuild"
+fi
+
 for dir in "${modules[@]}"; do
-  if [ "$force_rebuild_all" = true ] || [[ " ${modules_to_rebuild[@]} " =~ " ${dir} " ]]; then
+  if [[ " ${modules_to_rebuild[@]} " =~ " ${dir} " ]]; then
     (
       cd "${script_dir}/$dir"
       echo "Forcing rebuild for $dir..."
@@ -87,6 +90,7 @@ echo "Running PyG module verification..."
 bash pyg_modules_check.sh
 
 echo "Build and installation script complete."
+
 
 ### THE FOLLOWING IS FOR ZIPPING BUILT WHEELS FOR DISTRIBUTION
 
@@ -122,3 +126,4 @@ echo "Build and installation script complete."
 # done
 
 # rm ${current_path}/dist/torch_geometric-2.6.1-py3-none-any.whl
+
