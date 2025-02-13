@@ -81,7 +81,12 @@ done
 
 wait
 
-echo "Build and installation complete. All specified PyG modules have been built and installed."
+cd "${script_dir}"
+
+echo "Running PyG module verification..."
+bash pyg_modules_check.sh
+
+echo "Build and installation script complete."
 
 ### THE FOLLOWING IS FOR ZIPPING BUILT WHEELS FOR DISTRIBUTION
 
