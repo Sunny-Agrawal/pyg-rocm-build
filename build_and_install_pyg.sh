@@ -86,6 +86,13 @@ wait
 
 cd "${script_dir}"
 
+# Install pytorch_geometric
+cd "${script_dir}/pytorch_geometric-2.6.1"
+echo "Installing PyTorch Geometric..."
+pip install -e .
+
+cd "${script_dir}"
+
 echo "Running PyG module verification..."
 bash pyg_modules_check.sh
 
@@ -126,4 +133,3 @@ echo "Build and installation script complete."
 # done
 
 # rm ${current_path}/dist/torch_geometric-2.6.1-py3-none-any.whl
-
